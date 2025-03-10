@@ -15,6 +15,7 @@ import com.softbrain.hevix.adapters.ProductsAdapter
 import com.softbrain.hevix.databinding.ActivityProductListBinding
 import com.softbrain.hevix.models.ProductModel
 import com.softbrain.hevix.network.RetrofitClient
+import com.softbrain.hevix.utils.SharedPref
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
@@ -41,7 +42,8 @@ class ProductListActivity : AppCompatActivity() {
 
         context = this
         activity = this
-        userId = "1"
+        userId = SharedPref.getString(context, SharedPref.USER_ID).toString()
+
         customerId = intent.getStringExtra("customerId").toString()
         customerName = intent.getStringExtra("customerName").toString()
         customerMobile = intent.getStringExtra("customerMobile").toString()
@@ -57,6 +59,11 @@ class ProductListActivity : AppCompatActivity() {
             intent.putExtra("customerAddress", customerAddress)
             intent.putExtra("customerArea", customerArea)
             startActivity(intent)
+            finish()
+        })
+
+        binding.imgBack.setOnClickListener({
+            finish()
         })
 
     }
@@ -150,6 +157,8 @@ class ProductListActivity : AppCompatActivity() {
 
                                 AlertDialog.Builder(context)
                                     .setMessage(message)
+                                    .setPositiveButton("Ok",null)
+                                    .setCancelable(false)
                                     .show()
 
 

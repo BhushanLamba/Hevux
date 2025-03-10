@@ -3,6 +3,7 @@ package com.softbrain.hevix.ui
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
+import android.app.DatePickerDialog
 import android.app.ProgressDialog
 import android.content.Context
 import android.os.Bundle
@@ -20,24 +21,81 @@ import com.softbrain.hevix.databinding.ActivityWalletLedgerBinding
 import com.softbrain.hevix.models.PendingBillsModel
 import com.softbrain.hevix.models.WalletLedgerModel
 import com.softbrain.hevix.network.RetrofitClient
+import com.softbrain.hevix.utils.SharedPref
 import org.json.JSONObject
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class WalletLedgerActivity : AppCompatActivity() {
 
-    private lateinit var binding:ActivityWalletLedgerBinding
+    private lateinit var binding: ActivityWalletLedgerBinding
 
     private lateinit var context: Context
     private lateinit var activity: Activity
     private lateinit var userId: String
+    private lateinit var fromDate: String
+    private lateinit var toDate: String
+    private lateinit var apiDateFormat: SimpleDateFormat
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding=ActivityWalletLedgerBinding.inflate(layoutInflater)
+        binding = ActivityWalletLedgerBinding.inflate(layoutInflater)
         setContentView(binding.root)
         context = this
         activity = this
-        userId = "1"
+        userId = SharedPref.getString(context, SharedPref.USER_ID).toString()
+        apiDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
 
+        val calender = Calendar.getInstance()
+        val currentYear = calender.get(Calendar.YEAR)
+        val currentMonth = calender.get(Calendar.MONTH)
+        val today = calender.get(Calendar.DAY_OF_MONTH)
+
+        val fromDateCalender = Calendar.getInstance()
+        fromDateCalender.set(currentYear, currentMonth, today)
+        fromDate = apiDateFormat.format(fromDateCalender.time)
+        toDate = apiDateFormat.format(fromDateCalender.time)
+
+        binding.apply {
+            tvFromDate.text = fromDate
+            tvToDate.text = toDate
+
+            fromDateLy.setOnClickListener({
+                val datePickerDialog = DatePickerDialog(context, { _, year, month, dayOfMonth ->
+
+                    val selectedDate = Calendar.getInstance()
+                    selectedDate.set(year, month, dayOfMonth)
+                    fromDate = apiDateFormat.format(selectedDate.time)
+                    tvFromDate.text = fromDate
+
+                    getWalletLedger()
+
+                }, currentYear, currentMonth, today)
+
+                datePickerDialog.show()
+            })
+
+            toDateLy.setOnClickListener({
+                val datePickerDialog = DatePickerDialog(context, { _, year, month, dayOfMonth ->
+
+                    val selectedDate = Calendar.getInstance()
+                    selectedDate.set(year, month, dayOfMonth)
+                    toDate = apiDateFormat.format(selectedDate.time)
+                    tvToDate.text = toDate
+
+                    getWalletLedger()
+
+                }, currentYear, currentMonth, today)
+
+                datePickerDialog.show()
+            })
+
+            imgBack.setOnClickListener({
+                finish()
+            })
+        }
 
         getWalletLedger()
 
@@ -48,7 +106,7 @@ class WalletLedgerActivity : AppCompatActivity() {
         progressDialog.setCancelable(false)
         progressDialog.show()
         progressDialog.setMessage("Please wait...")
-        RetrofitClient.getInstance().api.getLedger(userId, "2025-03-01","2025-03-01")
+        RetrofitClient.getInstance().api.getLedger(userId, fromDate, toDate)
             .enqueue(object : retrofit2.Callback<JsonObject> {
                 @SuppressLint("SetTextI18n")
                 override fun onResponse(
@@ -65,18 +123,22 @@ class WalletLedgerActivity : AppCompatActivity() {
                                 val transactionsArray = responseObject.getJSONArray("transactions")
                                 val dataList = ArrayList<WalletLedgerModel>()
                                 for (position in 0 until transactionsArray.length()) {
-                                    val transactionObject = transactionsArray.getJSONObject(position)
+                                    val transactionObject =
+                                        transactionsArray.getJSONObject(position)
                                     val oldBalance = transactionObject.getString("OldBal")
                                     val amount = transactionObject.getString("Amount")
                                     val newBalance = transactionObject.getString("NewBal")
                                     val txnType = transactionObject.getString("TxnType")
                                     val remarks = transactionObject.getString("Remarks")
-                                    val txnDate = transactionObject.getString("TxnDate")
+                                    var txnDate = transactionObject.getString("TxnDate")
                                     val crDrType = transactionObject.getString("Cr_Dr_Type")
                                     val billNo = transactionObject.getString("BillNo")
 
-                                    val walletLedgerModel = WalletLedgerModel(oldBalance,amount,
-                                        newBalance,txnType,remarks,txnDate,crDrType,billNo)
+                                    txnDate=txnDate.split("T")[0]
+                                    val walletLedgerModel = WalletLedgerModel(
+                                        oldBalance, amount,
+                                        newBalance, txnType, remarks, txnDate, crDrType, billNo
+                                    )
                                     dataList.add(walletLedgerModel)
                                 }
 

@@ -5,8 +5,11 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.app.ProgressDialog
 import android.content.Context
+import android.content.DialogInterface
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.view.View.OnClickListener
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,6 +18,7 @@ import com.softbrain.hevix.adapters.CartAdapter
 import com.softbrain.hevix.databinding.ActivityCartBinding
 import com.softbrain.hevix.models.CartListModel
 import com.softbrain.hevix.network.RetrofitClient
+import com.softbrain.hevix.utils.SharedPref
 import org.json.JSONObject
 
 class CartActivity : AppCompatActivity() {
@@ -38,7 +42,8 @@ class CartActivity : AppCompatActivity() {
         setContentView(binding.root)
         context = this
         activity = this
-        userId = "1"
+        userId = SharedPref.getString(context, SharedPref.USER_ID).toString()
+
         customerId = intent.getStringExtra("customerId").toString()
         customerName = intent.getStringExtra("customerName").toString()
         customerMobile = intent.getStringExtra("customerMobile").toString()
@@ -61,6 +66,10 @@ class CartActivity : AppCompatActivity() {
                 remarks = etReceivedAmount.text.toString().trim()
 
                 bookOrder()
+            })
+
+            imgBack.setOnClickListener({
+                finish()
             })
         }
 
@@ -92,7 +101,16 @@ class CartActivity : AppCompatActivity() {
 
                                 AlertDialog.Builder(context)
                                     .setMessage(message)
-                                    .setPositiveButton("OK", null)
+                                    .setCancelable(false)
+                                    .setPositiveButton("OK", object : DialogInterface.OnClickListener
+                                    {
+                                        override fun onClick(dialog: DialogInterface?, which: Int) {
+                                            startActivity(Intent(activity, ReportActivity::class.java))
+                                            finish()
+                                        }
+
+
+                                    })
                                     .show()
 
                             } else {
@@ -141,15 +159,13 @@ class CartActivity : AppCompatActivity() {
                                 val transactionsArray = responseObject.getJSONArray("transactions")
                                 val dataList = ArrayList<CartListModel>()
                                 for (position in 0 until transactionsArray.length()) {
-                                    val transactionObject =
-                                        transactionsArray.getJSONObject(position)
+                                    val transactionObject = transactionsArray.getJSONObject(position)
                                     val id = transactionObject.getString("Id")
                                     val productName = transactionObject.getString("ProductName")
                                     val qty = transactionObject.getString("Qnt")
                                     val price = transactionObject.getString("Price")
                                     val total = transactionObject.getString("Total")
-                                    val cartListModel =
-                                        CartListModel(productName, qty, price, total, id)
+                                    val cartListModel = CartListModel(productName, qty, price, total, id)
 
                                     dataList.add(cartListModel)
                                 }

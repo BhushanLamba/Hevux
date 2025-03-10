@@ -59,7 +59,7 @@ public interface WEB_SERVICE {
     @FormUrlEncoded
     @POST("api/DeleteCart")
     Call<JsonObject> deleteCartItem(@Field("CartId") String CartId,
-                             @Field("LoginUserId") String LoginUserId);
+                                    @Field("LoginUserId") String LoginUserId);
 
 
     @FormUrlEncoded
@@ -72,7 +72,13 @@ public interface WEB_SERVICE {
                                @Field("CustAddress") String CustAddress,
                                @Field("MobileNo") String MobileNo,
                                @Field("CustArea") String CustArea,
-                               @Field("Remarks") String Remarks
-    );
+                               @Field("Remarks") String Remarks);
+
+    @FormUrlEncoded
+    @POST("api/BillReport")
+    Call<JsonObject> getReport(@Field("UserId") String UserId,
+                               @Field("PaymentStatus") String PaymentStatus);
+
+
 }
 

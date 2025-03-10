@@ -3,83 +3,90 @@ package com.softbrain.hevix.ui
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
-import android.app.DatePickerDialog
 import android.app.ProgressDialog
 import android.content.Context
 import android.os.Bundle
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.gson.JsonObject
-import com.softbrain.hevix.adapters.PendingBillAdapter
-import com.softbrain.hevix.databinding.ActivityPendingBillsBinding
-import com.softbrain.hevix.models.PendingBillsModel
+import com.softbrain.hevix.R
+import com.softbrain.hevix.adapters.CustomersAdapter
+import com.softbrain.hevix.adapters.ReportsAdapter
+import com.softbrain.hevix.databinding.ActivityReportBinding
+import com.softbrain.hevix.models.CustomerModel
+import com.softbrain.hevix.models.ReportModel
 import com.softbrain.hevix.network.RetrofitClient
+import com.softbrain.hevix.utils.Constants
 import com.softbrain.hevix.utils.SharedPref
 import org.json.JSONObject
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
 
-class PendingBillsActivity : AppCompatActivity() {
+class ReportActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityPendingBillsBinding
+    private lateinit var binding: ActivityReportBinding
     private lateinit var context: Context
     private lateinit var activity: Activity
     private lateinit var userId: String
-    private lateinit var apiDateFormat: SimpleDateFormat
-    private lateinit var date: String
+    private lateinit var statusList: ArrayList<String>
+    private lateinit var status: String
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityPendingBillsBinding.inflate(layoutInflater)
+        binding = ActivityReportBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         context = this
         activity = this
         userId = SharedPref.getString(context, SharedPref.USER_ID).toString()
-        apiDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
 
-        val calender = Calendar.getInstance()
-        val currentYear = calender.get(Calendar.YEAR)
-        val currentMonth = calender.get(Calendar.MONTH)
-        val today = calender.get(Calendar.DAY_OF_MONTH)
-
-        val fromDateCalender = Calendar.getInstance()
-        fromDateCalender.set(currentYear, currentMonth, today)
-        date = apiDateFormat.format(fromDateCalender.time)
-        getPendingBills()
-
+        statusList = Constants.getStatusList()
+        val adapter =
+            ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, statusList)
         binding.apply {
-            tvDate.text = date
+            spinnerStatus.adapter = adapter
+            spinnerStatus.onItemSelectedListener = object :
+                AdapterView.OnItemClickListener, AdapterView.OnItemSelectedListener {
+                override fun onItemClick(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                }
 
-            tvDate.setOnClickListener({
-                val datePickerDialog = DatePickerDialog(context, { _, year, month, dayOfMonth ->
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    status = statusList[position]
+                    getReport()
+                }
 
-                    val selectedDate = Calendar.getInstance()
-                    selectedDate.set(year, month, dayOfMonth)
-                    date = apiDateFormat.format(selectedDate.time)
-                    tvDate.text = date
-                    getPendingBills()
-
-                }, currentYear, currentMonth, today)
-
-                datePickerDialog.show()
-            })
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
+            }
 
             imgBack.setOnClickListener({
                 finish()
             })
         }
 
-
     }
 
-    private fun getPendingBills() {
+    private fun getReport() {
         val progressDialog = ProgressDialog(context)
         progressDialog.setCancelable(false)
         progressDialog.show()
         progressDialog.setMessage("Please wait...")
-        RetrofitClient.getInstance().api.getPendingBill(userId, date)
+        RetrofitClient.getInstance().api.getReport(userId, status)
             .enqueue(object : retrofit2.Callback<JsonObject> {
                 @SuppressLint("SetTextI18n")
                 override fun onResponse(
@@ -94,39 +101,41 @@ class PendingBillsActivity : AppCompatActivity() {
                             val message = responseObject.getString("response_msg")
                             if (responseCode.equals("TXN", ignoreCase = true)) {
                                 val transactionsArray = responseObject.getJSONArray("transactions")
-                                val dataList = ArrayList<PendingBillsModel>()
+                                val dataList = ArrayList<ReportModel>()
                                 for (position in 0 until transactionsArray.length()) {
                                     val transactionObject =
                                         transactionsArray.getJSONObject(position)
-                                    val customerName = transactionObject.getString("CustomerName")
+
+                                    val name = transactionObject.getString("CustomerName")
                                     val phone = transactionObject.getString("MobileNo")
                                     val address = transactionObject.getString("Address")
-                                    val totalAmount = transactionObject.getString("TotalAmt")
+                                    val amount = transactionObject.getString("TotalAmt")
                                     val receivedAmount = transactionObject.getString("ReceivedAmt")
                                     val balanceAmount = transactionObject.getString("BalanceAmt")
-                                    var billDate = transactionObject.getString("BillDate")
-                                    billDate=billDate.split("T")[0]
+                                    var date = transactionObject.getString("BillDate")
+                                    val status = transactionObject.getString("PaymentStatus")
 
-                                    val pendingBillModel = PendingBillsModel(
-                                        customerName,
-                                        phone,
-                                        address,
-                                        totalAmount,
-                                        receivedAmount,
-                                        balanceAmount,
-                                        billDate
+
+                                    date = date.split("T")[0]
+
+                                    val reportsModel = ReportModel(
+                                        name, phone, status, date, receivedAmount,
+                                        amount, balanceAmount, address
                                     )
-                                    dataList.add(pendingBillModel)
+
+                                    dataList.add(reportsModel)
                                 }
 
-                                val billAdapter = PendingBillAdapter(dataList)
+                                val customerAdapter =
+                                    ReportsAdapter(dataList)
                                 val layoutManager = LinearLayoutManager(
                                     context,
                                     LinearLayoutManager.VERTICAL,
                                     false
                                 )
-                                binding.billsRecycler.adapter = billAdapter
-                                binding.billsRecycler.layoutManager = layoutManager
+                                binding.reportRecycler.adapter = customerAdapter
+                                binding.reportRecycler.layoutManager = layoutManager
+
 
                             } else {
                                 AlertDialog.Builder(context)

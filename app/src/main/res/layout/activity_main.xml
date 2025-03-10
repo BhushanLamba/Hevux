@@ -55,7 +55,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                android:text="Hello Chandan Thakur"
+                android:text="Hello"
+                android:id="@+id/tv_name"
                 android:textColor="@color/black"
                 android:textSize="16sp"
                 android:textStyle="bold" />

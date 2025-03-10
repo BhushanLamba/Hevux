@@ -7,6 +7,9 @@ import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,6 +18,8 @@ import com.softbrain.hevix.adapters.CustomersAdapter
 import com.softbrain.hevix.databinding.ActivityCustomerListBinding
 import com.softbrain.hevix.models.CustomerModel
 import com.softbrain.hevix.network.RetrofitClient
+import com.softbrain.hevix.utils.Constants
+import com.softbrain.hevix.utils.SharedPref
 import org.json.JSONObject
 
 class CustomerListActivity : AppCompatActivity() {
@@ -23,6 +28,9 @@ class CustomerListActivity : AppCompatActivity() {
     private lateinit var context: Context
     private lateinit var activity: Activity
     private lateinit var userId: String
+    private lateinit var weekDaysList: ArrayList<String>
+    private lateinit var weekDay: String
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,9 +38,40 @@ class CustomerListActivity : AppCompatActivity() {
         setContentView(binding.root)
         context = this
         activity = this
-        userId = "1"
+        userId = SharedPref.getString(context, SharedPref.USER_ID).toString()
 
-        getCustomers()
+        weekDaysList = Constants.getWeekDaysList()
+        val adapter =
+            ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, weekDaysList)
+        binding.apply {
+            spinnerDays.adapter = adapter
+            spinnerDays.onItemSelectedListener = object :
+                AdapterView.OnItemClickListener, AdapterView.OnItemSelectedListener {
+                override fun onItemClick(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                }
+
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    weekDay = weekDaysList[position]
+                    getCustomers()
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
+            }
+
+            imgBack.setOnClickListener({
+                finish()
+            })
+        }
 
     }
 
@@ -41,7 +80,7 @@ class CustomerListActivity : AppCompatActivity() {
         progressDialog.setCancelable(false)
         progressDialog.show()
         progressDialog.setMessage("Please wait...")
-        RetrofitClient.getInstance().api.getCustomers(userId, "Monday")
+        RetrofitClient.getInstance().api.getCustomers(userId, weekDay)
             .enqueue(object : retrofit2.Callback<JsonObject> {
                 @SuppressLint("SetTextI18n")
                 override fun onResponse(
@@ -66,13 +105,15 @@ class CustomerListActivity : AppCompatActivity() {
                                     val address = transactionObject.getString("FullAddress")
                                     val area = transactionObject.getString("Area")
 
-                                    val customerModel = CustomerModel(name, phone,id,address,area)
+                                    val customerModel =
+                                        CustomerModel(name, phone, id, address, area)
                                     dataList.add(customerModel)
                                 }
 
-                                val customerAdapter = CustomersAdapter(dataList) { selectedCustomer: CustomerModel ->
-                                    selectCustomer(selectedCustomer)
-                                }
+                                val customerAdapter =
+                                    CustomersAdapter(dataList) { selectedCustomer: CustomerModel ->
+                                        selectCustomer(selectedCustomer)
+                                    }
                                 val layoutManager = LinearLayoutManager(
                                     context,
                                     LinearLayoutManager.VERTICAL,
@@ -103,15 +144,15 @@ class CustomerListActivity : AppCompatActivity() {
             })
     }
 
-    private fun selectCustomer(customerModel: CustomerModel)
-    {
-        val customerId=customerModel.id
-        val intent=Intent(activity,ProductListActivity::class.java)
-        intent.putExtra("customerId",customerId)
-        intent.putExtra("customerName",customerModel.name)
-        intent.putExtra("customerMobile",customerModel.phone)
-        intent.putExtra("customerAddress",customerModel.address)
-        intent.putExtra("customerArea",customerModel.area)
+    private fun selectCustomer(customerModel: CustomerModel) {
+        val customerId = customerModel.id
+        val intent = Intent(activity, ProductListActivity::class.java)
+        intent.putExtra("customerId", customerId)
+        intent.putExtra("customerName", customerModel.name)
+        intent.putExtra("customerMobile", customerModel.phone)
+        intent.putExtra("customerAddress", customerModel.address)
+        intent.putExtra("customerArea", customerModel.area)
         startActivity(intent)
+        finish()
     }
 }
