@@ -36,8 +36,19 @@ public interface WEB_SERVICE {
                                     @Field("DueDate") String DueDate);
 
     @FormUrlEncoded
+    @POST("api/GetBillDetails")
+    Call<JsonObject> getBillDetails(@Field("UserId") String UserId,
+                                    @Field("BillNo") String BillNo);
+
+    @FormUrlEncoded
     @POST("api/WalletLedger")
     Call<JsonObject> getLedger(@Field("UserId") String UserId,
+                               @Field("Datefrom") String Datefrom,
+                               @Field("Dateto") String Dateto);
+
+    @FormUrlEncoded
+    @POST("api/StockLedger")
+    Call<JsonObject> getStockLedger(@Field("UserId") String UserId,
                                @Field("Datefrom") String Datefrom,
                                @Field("Dateto") String Dateto);
 
@@ -79,6 +90,61 @@ public interface WEB_SERVICE {
     Call<JsonObject> getReport(@Field("UserId") String UserId,
                                @Field("PaymentStatus") String PaymentStatus);
 
+    @FormUrlEncoded
+    @POST("api/AddCustomer")
+    Call<JsonObject> addCustomer(@Field("ShopName") String ShopName,
+                                 @Field("CustomerName") String CustomerName,
+                                 @Field("EmailId") String EmailId,
+                                 @Field("Phone") String Phone,
+                                 @Field("Days") String Days,
+                                 @Field("FullAddress") String FullAddress,
+                                 @Field("PinCode") String PinCode,
+                                 @Field("State") String State,
+                                 @Field("Area") String Area,
+                                 @Field("AreaId") String AreaId,
+                                 @Field("Remarks") String Remarks);
+
+    @FormUrlEncoded
+    @POST("api/AreaList")
+    Call<JsonObject> getArea(@Field("UserId") String UserId,
+                             @Field("Days") String Days);
+
+    @FormUrlEncoded
+    @POST("api/Paybalance")
+    Call<JsonObject> payPendingBalance(@Field("LoginUserId") String LoginUserId,
+                                       @Field("PaymentMode") String PaymentMode,
+                                       @Field("BillNo") String BillNo,
+                                       @Field("Remarks") String Remarks,
+                                       @Field("Amount") String Amount);
+
+
+    @FormUrlEncoded
+    @POST("api/AddtoReturnCart")
+    Call<JsonObject> addToReturnCart(@Field("ProductId") String ProductId,
+                                     @Field("ProductName") String ProductName,
+                                     @Field("CustomerId") String CustomerId,
+                                     @Field("LoginUserId") String LoginUserId,
+                                     @Field("BillNo") String BillNo,
+                                     @Field("QNT") String QNT);
+
+    @FormUrlEncoded
+    @POST("api/ViewReturnCart")
+    Call<JsonObject> getReturnCart(@Field("CustomerId") String CustomerId,
+                                   @Field("LoginUserId") String LoginUserId,
+                                   @Field("BillNo") String BillNo);
+
+    @FormUrlEncoded
+    @POST("api/OrderReturn")
+    Call<JsonObject> bookReturnOrder(@Field("CustomerId") String CustomerId,
+                                     @Field("LoginUserId") String LoginUserId,
+                                     @Field("agentname") String agentname,
+                                     @Field("Billno") String Billno,
+                                     @Field("Remarks") String Remarks);
+
+    @FormUrlEncoded
+    @POST("api/DeleteReturnCart")
+    Call<JsonObject> deleteReturnCartItem(@Field("CartId") String CartId,
+                                          @Field("LoginUserId") String LoginUserId);
 
 }
 

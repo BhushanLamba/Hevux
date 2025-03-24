@@ -7,6 +7,8 @@ import android.app.DatePickerDialog
 import android.app.ProgressDialog
 import android.content.Context
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -37,6 +39,8 @@ class WalletLedgerActivity : AppCompatActivity() {
     private lateinit var fromDate: String
     private lateinit var toDate: String
     private lateinit var apiDateFormat: SimpleDateFormat
+    private lateinit var dataList: ArrayList<WalletLedgerModel>
+    private lateinit var ledgerAdapter: WalletLedgerAdapter
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -95,9 +99,46 @@ class WalletLedgerActivity : AppCompatActivity() {
             imgBack.setOnClickListener({
                 finish()
             })
+
+            etSearch.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    count: Int,
+                    after: Int
+                ) {
+
+                }
+
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    val searchKey = s.toString()
+                    filterData(searchKey)
+                }
+
+                override fun afterTextChanged(s: Editable?) {
+
+                }
+
+            })
         }
 
+
         getWalletLedger()
+
+    }
+
+    private fun filterData(searchKey: String) {
+        val filteredList = ArrayList<WalletLedgerModel>()
+
+        for (item in dataList) {
+            if (item.billNo.contains(searchKey)) {
+                filteredList.add(item)
+            }
+        }
+        if (filteredList.isNotEmpty())
+        {
+            ledgerAdapter.filterData(filteredList)
+        }
 
     }
 
@@ -121,7 +162,7 @@ class WalletLedgerActivity : AppCompatActivity() {
                             val message = responseObject.getString("response_msg")
                             if (responseCode.equals("TXN", ignoreCase = true)) {
                                 val transactionsArray = responseObject.getJSONArray("transactions")
-                                val dataList = ArrayList<WalletLedgerModel>()
+                                dataList = ArrayList<WalletLedgerModel>()
                                 for (position in 0 until transactionsArray.length()) {
                                     val transactionObject =
                                         transactionsArray.getJSONObject(position)
@@ -134,7 +175,7 @@ class WalletLedgerActivity : AppCompatActivity() {
                                     val crDrType = transactionObject.getString("Cr_Dr_Type")
                                     val billNo = transactionObject.getString("BillNo")
 
-                                    txnDate=txnDate.split("T")[0]
+                                    txnDate = txnDate.split("T")[0]
                                     val walletLedgerModel = WalletLedgerModel(
                                         oldBalance, amount,
                                         newBalance, txnType, remarks, txnDate, crDrType, billNo
@@ -142,7 +183,7 @@ class WalletLedgerActivity : AppCompatActivity() {
                                     dataList.add(walletLedgerModel)
                                 }
 
-                                val ledgerAdapter = WalletLedgerAdapter(dataList)
+                                ledgerAdapter = WalletLedgerAdapter(dataList)
                                 val layoutManager = LinearLayoutManager(
                                     context,
                                     LinearLayoutManager.VERTICAL,

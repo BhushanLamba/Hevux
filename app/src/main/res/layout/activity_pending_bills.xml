@@ -50,6 +50,19 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <EditText
+        android:drawableStart="@drawable/search"
+        android:drawablePadding="10dp"
+        android:drawableTint="@color/grey"
+        android:singleLine="true"
+        android:id="@+id/et_search"
+        android:background="@drawable/round_back"
+        android:padding="10dp"
+        android:hint="Search Mobile no..."
+        android:layout_margin="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/bills_recycler"
         android:layout_width="match_parent"

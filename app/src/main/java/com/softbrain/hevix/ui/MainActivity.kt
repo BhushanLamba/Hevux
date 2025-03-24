@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.service.quicksettings.PendingIntentActivityWrapper
 import com.google.gson.JsonObject
 import com.softbrain.hevix.databinding.ActivityMainBinding
 import com.softbrain.hevix.databinding.SelectSalesProductDialogBinding
@@ -66,6 +67,20 @@ class MainActivity : AppCompatActivity() {
             reportLy.setOnClickListener({
                 startActivity(Intent(activity, ReportActivity::class.java))
             })
+
+            todayVisitLy.setOnClickListener({
+                val intent = Intent(activity, CustomerListActivity::class.java)
+                intent.putExtra("type", "TODAY_VISIT")
+                startActivity(intent)
+            })
+
+            returnProductLy.setOnClickListener({
+                startActivity(Intent(activity,ReturnProductActivity::class.java))
+            })
+
+            stockLedgerLy.setOnClickListener({
+                startActivity(Intent(activity, StockLedgerActivity::class.java))
+            })
         }
     }
 
@@ -89,11 +104,14 @@ class MainActivity : AppCompatActivity() {
         binding.apply {
             selectCustomerLy.setOnClickListener({
                 salesProductDialog.dismiss()
-                startActivity(Intent(activity, CustomerListActivity::class.java))
+                val intent = Intent(activity, CustomerListActivity::class.java)
+                intent.putExtra("type", "SALES_PRODUCT")
+                startActivity(intent)
             })
 
             addNewLy.setOnClickListener({
                 salesProductDialog.dismiss()
+                startActivity(Intent(activity, AddCustomerActivity::class.java))
             })
 
 

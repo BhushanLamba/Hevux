@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.softbrain.hevix.databinding.CartItemBinding
 import com.softbrain.hevix.models.CartListModel
 
-class CartAdapter(private val dataList: ArrayList<CartListModel>,private val deleteItem: (CartListModel) -> Unit) :
+class CartAdapter(private val dataList: ArrayList<CartListModel>, private val deleteItem: ((CartListModel) -> Unit)) :
     RecyclerView.Adapter<CartViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CartViewHolder {
         val binding = CartItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)

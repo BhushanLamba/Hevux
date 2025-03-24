@@ -1,6 +1,41 @@
 package com.softbrain.hevix.utils
 
 object Constants {
+
+    val statesList = arrayListOf(
+        "Bihar",
+        "Delhi",
+        "Bengal",
+        "Andhra Pradesh",
+        "Arunachal Pradesh",
+        "Assam",
+        "Chhattisgarh",
+        "Goa",
+        "Gujarat",
+        "Haryana",
+        "Himachal Pradesh",
+        "Jharkhand",
+        "Karnataka",
+        "Kerala",
+        "Madhya Pradesh",
+        "Maharashtra",
+        "Manipur",
+        "Meghalaya",
+        "Mizoram",
+        "Nagaland",
+        "Odisha",
+        "Punjab",
+        "Rajasthan",
+        "Sikkim",
+        "Tamil Nadu",
+        "Telangana",
+        "Tripura",
+        "Uttarakhand",
+        "Uttar Pradesh",
+        "West Bengal"
+    )
+
+
     private val weekDaysList = ArrayList<String>()
 
     private val statusList = ArrayList<String>()

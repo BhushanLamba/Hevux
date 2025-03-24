@@ -30,6 +30,7 @@ class CustomerListActivity : AppCompatActivity() {
     private lateinit var userId: String
     private lateinit var weekDaysList: ArrayList<String>
     private lateinit var weekDay: String
+    private lateinit var type: String
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,14 +40,13 @@ class CustomerListActivity : AppCompatActivity() {
         context = this
         activity = this
         userId = SharedPref.getString(context, SharedPref.USER_ID).toString()
+        type = intent.getStringExtra("type").toString()
 
         weekDaysList = Constants.getWeekDaysList()
-        val adapter =
-            ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, weekDaysList)
+        val adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, weekDaysList)
         binding.apply {
             spinnerDays.adapter = adapter
-            spinnerDays.onItemSelectedListener = object :
-                AdapterView.OnItemClickListener, AdapterView.OnItemSelectedListener {
+            spinnerDays.onItemSelectedListener = object : AdapterView.OnItemClickListener, AdapterView.OnItemSelectedListener {
                 override fun onItemClick(
                     parent: AdapterView<*>?,
                     view: View?,
@@ -110,10 +110,7 @@ class CustomerListActivity : AppCompatActivity() {
                                     dataList.add(customerModel)
                                 }
 
-                                val customerAdapter =
-                                    CustomersAdapter(dataList) { selectedCustomer: CustomerModel ->
-                                        selectCustomer(selectedCustomer)
-                                    }
+                                val customerAdapter = CustomersAdapter(dataList,{ selectedCustomer: CustomerModel -> selectCustomer(selectedCustomer) },type)
                                 val layoutManager = LinearLayoutManager(
                                     context,
                                     LinearLayoutManager.VERTICAL,
@@ -145,14 +142,16 @@ class CustomerListActivity : AppCompatActivity() {
     }
 
     private fun selectCustomer(customerModel: CustomerModel) {
-        val customerId = customerModel.id
-        val intent = Intent(activity, ProductListActivity::class.java)
-        intent.putExtra("customerId", customerId)
-        intent.putExtra("customerName", customerModel.name)
-        intent.putExtra("customerMobile", customerModel.phone)
-        intent.putExtra("customerAddress", customerModel.address)
-        intent.putExtra("customerArea", customerModel.area)
-        startActivity(intent)
-        finish()
+        if (type.equals("SALES_PRODUCT", true)) {
+            val customerId = customerModel.id
+            val intent = Intent(activity, ProductListActivity::class.java)
+            intent.putExtra("customerId", customerId)
+            intent.putExtra("customerName", customerModel.name)
+            intent.putExtra("customerMobile", customerModel.phone)
+            intent.putExtra("customerAddress", customerModel.address)
+            intent.putExtra("customerArea", customerModel.area)
+            startActivity(intent)
+            finish()
+        }
     }
 }

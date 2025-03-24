@@ -48,7 +48,6 @@
                 app:hintTextColor="@color/primaryColor">
 
                 <EditText
-                    android:text="9891626621"
                     android:id="@+id/et_user_id"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -76,7 +75,6 @@
                 app:hintTextColor="@color/primaryColor">
 
                 <EditText
-                    android:text="9891626621"
                     android:id="@+id/et_password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

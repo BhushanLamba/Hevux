@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.softbrain.hevix.databinding.LedgerItemBinding
 import com.softbrain.hevix.models.WalletLedgerModel
 
-class WalletLedgerAdapter(private val dataList: ArrayList<WalletLedgerModel>) :
+class WalletLedgerAdapter(private var dataList: ArrayList<WalletLedgerModel>) :
     RecyclerView.Adapter<WalletLedgerViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WalletLedgerViewHolder {
         val binding = LedgerItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -20,6 +20,11 @@ class WalletLedgerAdapter(private val dataList: ArrayList<WalletLedgerModel>) :
     override fun onBindViewHolder(holder: WalletLedgerViewHolder, position: Int) {
         val ledgerModel = dataList[position]
         holder.bind(ledgerModel)
+    }
+
+    fun filterData(filteredList: ArrayList<WalletLedgerModel>) {
+        dataList=filteredList
+        notifyDataSetChanged()
     }
 
 }

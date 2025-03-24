@@ -91,8 +91,9 @@ class ProductListActivity : AppCompatActivity() {
                                         transactionsArray.getJSONObject(position)
                                     val name = transactionObject.getString("ProductName")
                                     val id = transactionObject.getString("ID")
+                                    val stock = transactionObject.getString("Stock")
 
-                                    val productModel = ProductModel(name, id)
+                                    val productModel = ProductModel(name, id,stock)
                                     dataList.add(productModel)
                                 }
 

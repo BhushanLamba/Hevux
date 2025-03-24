@@ -1,5 +1,6 @@
 package com.softbrain.hevix.adapters
 
+import android.annotation.SuppressLint
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -30,9 +31,11 @@ class ProductsAdapter(
 
 class ProductsViewHolder(private val binding: ProductsItemBinding) :
     RecyclerView.ViewHolder(binding.root) {
-    fun bind(productModel: ProductModel, clickListener: (ProductModel,String) -> Unit) {
+    @SuppressLint("SetTextI18n")
+    fun bind(productModel: ProductModel, clickListener: (ProductModel, String) -> Unit) {
         binding.apply {
             tvProductName.text = productModel.productName
+            tvStosck.text = "(${productModel.stock})"
 
             tvAdd.setOnClickListener({
                 val qty = etQty.text.toString().trim()

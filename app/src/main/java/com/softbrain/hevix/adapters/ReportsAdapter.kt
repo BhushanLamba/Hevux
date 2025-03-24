@@ -5,9 +5,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.softbrain.hevix.databinding.ReportItemBinding
 import com.softbrain.hevix.models.ReportModel
-import com.softbrain.hevix.models.WalletLedgerModel
 
-class ReportsAdapter(private val dataList: ArrayList<ReportModel>) :RecyclerView.Adapter<ReportsViewHolder>() {
+class ReportsAdapter(private var dataList: ArrayList<ReportModel>) :RecyclerView.Adapter<ReportsViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReportsViewHolder {
         val binding=ReportItemBinding.inflate(LayoutInflater.from(parent.context),parent,false)
         return ReportsViewHolder(binding)
@@ -20,6 +19,12 @@ class ReportsAdapter(private val dataList: ArrayList<ReportModel>) :RecyclerView
     override fun onBindViewHolder(holder: ReportsViewHolder, position: Int) {
         val reportsModel=dataList[position]
         holder.bind(reportsModel)
+    }
+
+    fun filterData(filteredList: ArrayList<ReportModel>) {
+        dataList=filteredList
+        notifyDataSetChanged()
+
     }
 }
 
@@ -34,6 +39,7 @@ class ReportsViewHolder(val binding: ReportItemBinding) : RecyclerView.ViewHolde
             tvAmount.text = reportModel.amount
             tvBalanceAmount.text = reportModel.balanceAmount
             tvAddress.text = reportModel.address
+            tvBillNo.text = reportModel.billNo
         }
     }
 }

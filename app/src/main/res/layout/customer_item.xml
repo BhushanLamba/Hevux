@@ -57,4 +57,54 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/area_ly"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_weight="1"
+            android:layout_margin="4dp"
+            android:text="Area"
+            android:textColor="@color/grey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/tv_area"
+            android:textColor="@color/black"
+            android:layout_weight="1"
+            android:layout_margin="4dp"
+            android:text="Area"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/address_ly"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_weight="1"
+            android:layout_margin="4dp"
+            android:text="Address"
+            android:textColor="@color/grey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/tv_address"
+            android:textColor="@color/black"
+            android:layout_weight="1"
+            android:layout_margin="4dp"
+            android:text="Address"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
 </LinearLayout>

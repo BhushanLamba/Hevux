@@ -36,6 +36,8 @@ public class LoginActivity extends AppCompatActivity {
     Context context;
     Activity activity;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +45,14 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         context = this;
         activity = this;
+
+        userName=SharedPref.getString(context,SharedPref.USER_NAME);
+        password=SharedPref.getString(context,SharedPref.PASSWORD);
+
+        binding.etUserId.setText(userName);
+        binding.etPassword.setText(password);
+
+
 
         handleClicks();
     }
@@ -86,6 +96,8 @@ public class LoginActivity extends AppCompatActivity {
                                     SharedPref.setString(context, SharedPref.LOGIN_DATA_KEY, transactionObject.toString());
                                     SharedPref.setString(context, SharedPref.USER_ID, userId);
                                     SharedPref.setString(context, SharedPref.NAME, name);
+                                    SharedPref.setString(context, SharedPref.PASSWORD, password);
+                                    SharedPref.setString(context, SharedPref.USER_NAME, userName);
 
                                     startActivity(new Intent(activity, MainActivity.class));
                                     finish();

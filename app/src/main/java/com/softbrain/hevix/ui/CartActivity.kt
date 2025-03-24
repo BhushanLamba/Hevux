@@ -9,7 +9,6 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.view.View.OnClickListener
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -60,10 +59,9 @@ class CartActivity : AppCompatActivity() {
                 detailsLy.visibility = View.VISIBLE
             })
 
-
             btnBookOrder.setOnClickListener({
                 receivedAmount = etReceivedAmount.text.toString().trim()
-                remarks = etReceivedAmount.text.toString().trim()
+                remarks = etRemarks.text.toString().trim()
 
                 bookOrder()
             })
