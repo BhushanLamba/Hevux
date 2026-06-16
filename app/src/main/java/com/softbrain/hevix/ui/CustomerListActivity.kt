@@ -7,6 +7,8 @@ import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -17,6 +19,7 @@ import com.google.gson.JsonObject
 import com.softbrain.hevix.adapters.CustomersAdapter
 import com.softbrain.hevix.databinding.ActivityCustomerListBinding
 import com.softbrain.hevix.models.CustomerModel
+import com.softbrain.hevix.models.WalletLedgerModel
 import com.softbrain.hevix.network.RetrofitClient
 import com.softbrain.hevix.utils.Constants
 import com.softbrain.hevix.utils.SharedPref
@@ -31,6 +34,8 @@ class CustomerListActivity : AppCompatActivity() {
     private lateinit var weekDaysList: ArrayList<String>
     private lateinit var weekDay: String
     private lateinit var type: String
+    private lateinit var dataList:ArrayList<CustomerModel>
+    private lateinit var customerAdapter:CustomersAdapter
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,9 +76,47 @@ class CustomerListActivity : AppCompatActivity() {
             imgBack.setOnClickListener({
                 finish()
             })
+
+            etSearch.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    count: Int,
+                    after: Int
+                ) {
+
+                }
+
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    val searchKey = s.toString()
+                    filterData(searchKey)
+                }
+
+                override fun afterTextChanged(s: Editable?) {
+
+                }
+
+            })
+
         }
 
     }
+
+    private fun filterData(searchKey: String) {
+        val filteredList = ArrayList<CustomerModel>()
+
+        for (item in dataList) {
+            if (item.phone.contains(searchKey)) {
+                filteredList.add(item)
+            }
+        }
+        if (filteredList.isNotEmpty())
+        {
+            customerAdapter.filterData(filteredList)
+        }
+
+    }
+
 
     private fun getCustomers() {
         val progressDialog = ProgressDialog(context)
@@ -95,7 +138,7 @@ class CustomerListActivity : AppCompatActivity() {
                             val message = responseObject.getString("response_msg")
                             if (responseCode.equals("TXN", ignoreCase = true)) {
                                 val transactionsArray = responseObject.getJSONArray("transactions")
-                                val dataList = ArrayList<CustomerModel>()
+                                dataList = ArrayList()
                                 for (position in 0 until transactionsArray.length()) {
                                     val transactionObject =
                                         transactionsArray.getJSONObject(position)
@@ -110,7 +153,7 @@ class CustomerListActivity : AppCompatActivity() {
                                     dataList.add(customerModel)
                                 }
 
-                                val customerAdapter = CustomersAdapter(dataList,{ selectedCustomer: CustomerModel -> selectCustomer(selectedCustomer) },type)
+                                customerAdapter = CustomersAdapter(dataList,{ selectedCustomer: CustomerModel -> selectCustomer(selectedCustomer) },type)
                                 val layoutManager = LinearLayoutManager(
                                     context,
                                     LinearLayoutManager.VERTICAL,

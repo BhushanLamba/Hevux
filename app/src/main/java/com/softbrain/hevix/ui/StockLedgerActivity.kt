@@ -38,6 +38,8 @@ class StockLedgerActivity : AppCompatActivity() {
     private lateinit var fromDate: String
     private lateinit var toDate: String
     private lateinit var apiDateFormat: SimpleDateFormat
+    private lateinit var showDateFormat: SimpleDateFormat
+
     private lateinit var dataList: ArrayList<StockLedgerModel>
     private lateinit var ledgerAdapter: StockLedgerAdapter
 
@@ -49,6 +51,8 @@ class StockLedgerActivity : AppCompatActivity() {
         activity = this
         userId = SharedPref.getString(context, SharedPref.USER_ID).toString()
         apiDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+        showDateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.US)
+
 
         val calender = Calendar.getInstance()
         val currentYear = calender.get(Calendar.YEAR)
@@ -172,6 +176,16 @@ class StockLedgerActivity : AppCompatActivity() {
                                     val billNo = transactionObject.getString("BillNo")
 
                                     txnDate = txnDate.split("T")[0]
+
+
+                                    try {
+                                        val date = apiDateFormat.parse(txnDate)
+                                        if (date != null) {
+                                            txnDate=showDateFormat.format(date)
+                                        }
+                                    } catch (ignore: Exception) {
+                                    }
+
                                     val walletLedgerModel = StockLedgerModel(
                                         oldStock, stock,
                                         newStock, txnType, remarks, txnDate, crDrType, billNo

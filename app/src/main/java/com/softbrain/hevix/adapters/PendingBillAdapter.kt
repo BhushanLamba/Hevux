@@ -8,8 +8,10 @@ import com.softbrain.hevix.databinding.PendingBillsItemBinding
 import com.softbrain.hevix.models.PendingBillsModel
 
 class PendingBillAdapter(
-    private var dataList: ArrayList<PendingBillsModel>, private val
-    payPendingBill: (PendingBillsModel) -> Unit,private val billDetails: (PendingBillsModel) -> Unit
+    private var dataList: ArrayList<PendingBillsModel>,
+    private val
+    payPendingBill: (PendingBillsModel) -> Unit,
+    private val billDetails: (PendingBillsModel) -> Unit
 ) :
     RecyclerView.Adapter<PendingBillsViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PendingBillsViewHolder {
@@ -37,25 +39,26 @@ class PendingBillAdapter(
 class PendingBillsViewHolder(private val binding: PendingBillsItemBinding) :
     RecyclerView.ViewHolder(binding.root) {
     @SuppressLint("SetTextI18n")
-    fun bind(pendingBillsModel: PendingBillsModel, payPendingBill: (PendingBillsModel) -> Unit,
-             billDetails:(PendingBillsModel) -> Unit) {
-        val customerName = pendingBillsModel.customerName
-        val phone = pendingBillsModel.mobileNumber
-        val totalAmount = pendingBillsModel.totalAmount
-        val receivedAmount = pendingBillsModel.receivedAmount
-        val balanceAmount = pendingBillsModel.balanceAmount
-        val address = pendingBillsModel.address
+    fun bind(
+        pendingBillsModel: PendingBillsModel, payPendingBill: (PendingBillsModel) -> Unit,
+        billDetails: (PendingBillsModel) -> Unit
+    ) {
+
         val billNo = pendingBillsModel.id
 
 
         binding.apply {
             tvBillNo.text = billNo
-            tvName.text = customerName
-            tvPhone.text = phone
-            tvTotalAmount.text = "₹ $totalAmount"
-            tvReceivedAmount.text = "₹ $receivedAmount"
-            tvBalanceAmount.text = "₹ $balanceAmount"
-            tvAddress.text = address
+            tvName.text = pendingBillsModel.customerName
+            tvPhone.text = pendingBillsModel.mobileNumber
+            tvTotalAmount.text = "₹ ${pendingBillsModel.totalAmount}"
+            tvReceivedAmount.text = "₹ ${pendingBillsModel.receivedAmount}"
+            tvBalanceAmount.text = "₹ ${pendingBillsModel.balanceAmount}"
+            tvAddress.text = pendingBillsModel.address
+            tvArea.text = pendingBillsModel.area
+            tvBillDate.text = pendingBillsModel.billDate
+            tvPaymentStatus.text = pendingBillsModel.paymentStatus
+            tvDay.text = pendingBillsModel.day
 
 
             root.setOnClickListener {

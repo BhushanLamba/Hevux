@@ -8,7 +8,7 @@ import com.softbrain.hevix.databinding.CustomerItemBinding
 import com.softbrain.hevix.models.CustomerModel
 
 class CustomersAdapter(
-    private val customerList: ArrayList<CustomerModel>,private val clickListener: (CustomerModel) -> Unit,private val type:String) : RecyclerView.Adapter<CustomerViewHolder>() {
+    private var customerList: ArrayList<CustomerModel>,private val clickListener: (CustomerModel) -> Unit,private val type:String) : RecyclerView.Adapter<CustomerViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CustomerViewHolder {
         val binding=CustomerItemBinding.inflate(LayoutInflater.from(parent.context),parent,false)
         return CustomerViewHolder(binding)
@@ -21,6 +21,11 @@ class CustomersAdapter(
     override fun onBindViewHolder(holder: CustomerViewHolder, position: Int) {
        val customerModel=customerList[position]
         holder.bind(customerModel,clickListener,type)
+    }
+
+    fun filterData(filteredList: ArrayList<CustomerModel>) {
+        customerList=filteredList
+        notifyDataSetChanged()
     }
 }
 

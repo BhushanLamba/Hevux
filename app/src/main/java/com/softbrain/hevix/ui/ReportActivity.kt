@@ -5,6 +5,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.app.ProgressDialog
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -17,12 +18,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.gson.JsonObject
 import com.softbrain.hevix.adapters.ReportsAdapter
 import com.softbrain.hevix.databinding.ActivityReportBinding
+import com.softbrain.hevix.models.PendingBillsModel
 import com.softbrain.hevix.models.ReportModel
-import com.softbrain.hevix.models.WalletLedgerModel
 import com.softbrain.hevix.network.RetrofitClient
 import com.softbrain.hevix.utils.Constants
 import com.softbrain.hevix.utils.SharedPref
 import org.json.JSONObject
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class ReportActivity : AppCompatActivity() {
 
@@ -34,7 +37,8 @@ class ReportActivity : AppCompatActivity() {
     private lateinit var status: String
     private lateinit var dataList: ArrayList<ReportModel>
     private lateinit var adapter: ReportsAdapter
-
+    private lateinit var apiDateFormat: SimpleDateFormat
+    private lateinit var showDateFormat: SimpleDateFormat
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +48,8 @@ class ReportActivity : AppCompatActivity() {
         context = this
         activity = this
         userId = SharedPref.getString(context, SharedPref.USER_ID).toString()
-
+        apiDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+        showDateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.US)
         statusList = Constants.getStatusList()
         val adapter =
             ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, statusList)
@@ -107,12 +112,11 @@ class ReportActivity : AppCompatActivity() {
         val filteredList = ArrayList<ReportModel>()
 
         for (item in dataList) {
-            if (item.billNo.contains(searchKey)) {
+            if (item.billNo.contains(searchKey) || item.phone.contains(searchKey)) {
                 filteredList.add(item)
             }
         }
-        if (filteredList.isNotEmpty())
-        {
+        if (filteredList.isNotEmpty()) {
             adapter.filterData(filteredList)
         }
 
@@ -146,26 +150,39 @@ class ReportActivity : AppCompatActivity() {
                                     val name = transactionObject.getString("CustomerName")
                                     val phone = transactionObject.getString("MobileNo")
                                     val address = transactionObject.getString("Address")
+                                    val area = transactionObject.getString("Area")
                                     val amount = transactionObject.getString("TotalAmt")
                                     val receivedAmount = transactionObject.getString("ReceivedAmt")
                                     val balanceAmount = transactionObject.getString("BalanceAmt")
-                                    var date = transactionObject.getString("BillDate")
+                                    var txnDate = transactionObject.getString("BillDate")
                                     val status = transactionObject.getString("PaymentStatus")
                                     val billNo = transactionObject.getString("Id")
 
 
-                                    date = date.split("T")[0]
+                                    txnDate = txnDate.split("T")[0]
+
+                                    try {
+                                        val date = apiDateFormat.parse(txnDate)
+                                        if (date != null) {
+                                            txnDate=showDateFormat.format(date)
+                                        }
+                                    } catch (ignore: Exception) {
+                                    }
 
                                     val reportsModel = ReportModel(
-                                        name, phone, status, date, receivedAmount,
-                                        amount, balanceAmount, address,billNo
+                                        name, phone, status, txnDate, receivedAmount,
+                                        amount, balanceAmount, address, billNo, area
                                     )
 
                                     dataList.add(reportsModel)
                                 }
 
                                 adapter =
-                                    ReportsAdapter(dataList)
+                                    ReportsAdapter(dataList) { model: ReportModel ->
+                                        getBillDetails(
+                                            model
+                                        )
+                                    }
                                 val layoutManager = LinearLayoutManager(
                                     context,
                                     LinearLayoutManager.VERTICAL,
@@ -196,4 +213,53 @@ class ReportActivity : AppCompatActivity() {
                 }
             })
     }
+
+    private fun getBillDetails(reportsModel: ReportModel) {
+        val billNo = reportsModel.billNo
+        val progressDialog = ProgressDialog(context)
+        progressDialog.setCancelable(false)
+        progressDialog.show()
+        progressDialog.setMessage("Please wait...")
+        RetrofitClient.getInstance().api.getBillDetails(userId, billNo)
+            .enqueue(object : retrofit2.Callback<JsonObject> {
+                @SuppressLint("SetTextI18n")
+                override fun onResponse(
+                    call: retrofit2.Call<JsonObject>,
+                    response: retrofit2.Response<JsonObject>
+                ) {
+                    if (response.isSuccessful) {
+                        try {
+                            val responseObject = JSONObject(response.body().toString())
+
+                            val responseCode = responseObject.getString("response_code")
+                            val message = responseObject.getString("response_msg")
+                            if (responseCode.equals("TXN", ignoreCase = true)) {
+                                val intent = Intent(activity, BillDetailsActivity::class.java)
+
+                                intent.putExtra("response", responseObject.toString())
+                                startActivity(intent)
+
+                            } else {
+                                AlertDialog.Builder(context)
+                                    .setMessage(message)
+                                    .setPositiveButton("OK", null)
+                                    .show()
+                            }
+                        } catch (e: Exception) {
+                            Toast.makeText(context, e.localizedMessage, Toast.LENGTH_SHORT).show()
+                        }
+                    } else {
+                        Toast.makeText(context, response.message(), Toast.LENGTH_LONG).show()
+                    }
+                    progressDialog.dismiss()
+                }
+
+                override fun onFailure(call: retrofit2.Call<JsonObject>, t: Throwable) {
+                    progressDialog.dismiss()
+                    Toast.makeText(context, t.localizedMessage, Toast.LENGTH_LONG).show()
+                }
+            })
+
+    }
+
 }

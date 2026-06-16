@@ -49,8 +49,8 @@ public interface WEB_SERVICE {
     @FormUrlEncoded
     @POST("api/StockLedger")
     Call<JsonObject> getStockLedger(@Field("UserId") String UserId,
-                               @Field("Datefrom") String Datefrom,
-                               @Field("Dateto") String Dateto);
+                                    @Field("Datefrom") String Datefrom,
+                                    @Field("Dateto") String Dateto);
 
 
     @FormUrlEncoded
@@ -145,6 +145,10 @@ public interface WEB_SERVICE {
     @POST("api/DeleteReturnCart")
     Call<JsonObject> deleteReturnCartItem(@Field("CartId") String CartId,
                                           @Field("LoginUserId") String LoginUserId);
+
+    @FormUrlEncoded
+    @POST("api/StockDetails")
+    Call<JsonObject> getStockSummary(@Field("UserId") String UserId);
 
 }
 

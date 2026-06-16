@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.softbrain.hevix.databinding.ReportItemBinding
 import com.softbrain.hevix.models.ReportModel
 
-class ReportsAdapter(private var dataList: ArrayList<ReportModel>) :RecyclerView.Adapter<ReportsViewHolder>() {
+class ReportsAdapter(private var dataList: ArrayList<ReportModel>,private val shareData: (ReportModel) -> Unit) :RecyclerView.Adapter<ReportsViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReportsViewHolder {
         val binding=ReportItemBinding.inflate(LayoutInflater.from(parent.context),parent,false)
         return ReportsViewHolder(binding)
@@ -18,7 +18,7 @@ class ReportsAdapter(private var dataList: ArrayList<ReportModel>) :RecyclerView
 
     override fun onBindViewHolder(holder: ReportsViewHolder, position: Int) {
         val reportsModel=dataList[position]
-        holder.bind(reportsModel)
+        holder.bind(reportsModel,shareData)
     }
 
     fun filterData(filteredList: ArrayList<ReportModel>) {
@@ -29,7 +29,7 @@ class ReportsAdapter(private var dataList: ArrayList<ReportModel>) :RecyclerView
 }
 
 class ReportsViewHolder(val binding: ReportItemBinding) : RecyclerView.ViewHolder(binding.root) {
-    fun bind(reportModel: ReportModel) {
+    fun bind(reportModel: ReportModel,shareData: (ReportModel) -> Unit) {
         binding.apply {
             tvName.text = reportModel.name
             tvMobile.text = reportModel.phone
@@ -40,6 +40,10 @@ class ReportsViewHolder(val binding: ReportItemBinding) : RecyclerView.ViewHolde
             tvBalanceAmount.text = reportModel.balanceAmount
             tvAddress.text = reportModel.address
             tvBillNo.text = reportModel.billNo
+
+            tvViewDetails.setOnClickListener({
+                shareData(reportModel)
+            })
         }
     }
 }

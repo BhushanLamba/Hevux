@@ -29,6 +29,8 @@ class PayPendingBillActivity : AppCompatActivity() {
     private lateinit var receivedAmount: String
     private lateinit var remarks: String
     private lateinit var billNo: String
+    private var paymentMode="CASH"
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,11 +54,16 @@ class PayPendingBillActivity : AppCompatActivity() {
     }
 
     private fun payPendingBills() {
+        paymentMode = if(binding.rbCash.isChecked) {
+            "CASH"
+        } else {
+            "ONLINE"
+        }
         val progressDialog = ProgressDialog(context)
         progressDialog.setCancelable(false)
         progressDialog.show()
         progressDialog.setMessage("Please wait...")
-        RetrofitClient.getInstance().api.payPendingBalance(userId,"CASH",
+        RetrofitClient.getInstance().api.payPendingBalance(userId,paymentMode,
             billNo,remarks,receivedAmount)
             .enqueue(object : retrofit2.Callback<JsonObject> {
                 @SuppressLint("SetTextI18n")

@@ -81,6 +81,10 @@ class MainActivity : AppCompatActivity() {
             stockLedgerLy.setOnClickListener({
                 startActivity(Intent(activity, StockLedgerActivity::class.java))
             })
+
+            stockSummaryLy.setOnClickListener {
+                startActivity(Intent(activity,StockSummaryActivity::class.java))
+            }
         }
     }
 

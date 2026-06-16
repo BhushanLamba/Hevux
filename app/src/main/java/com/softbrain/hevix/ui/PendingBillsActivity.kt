@@ -10,6 +10,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,6 +21,7 @@ import com.softbrain.hevix.adapters.PendingBillAdapter
 import com.softbrain.hevix.databinding.ActivityPendingBillsBinding
 import com.softbrain.hevix.models.PendingBillsModel
 import com.softbrain.hevix.network.RetrofitClient
+import com.softbrain.hevix.utils.Constants
 import com.softbrain.hevix.utils.SharedPref
 import org.json.JSONObject
 import java.text.SimpleDateFormat
@@ -31,9 +35,11 @@ class PendingBillsActivity : AppCompatActivity() {
     private lateinit var activity: Activity
     private lateinit var userId: String
     private lateinit var apiDateFormat: SimpleDateFormat
-    private lateinit var date: String
+    private lateinit var showDateFormat: SimpleDateFormat
     private lateinit var dataList: ArrayList<PendingBillsModel>
     private lateinit var billAdapter: PendingBillAdapter
+    private lateinit var weekDaysList: ArrayList<String>
+    private lateinit var weekDay: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,34 +49,39 @@ class PendingBillsActivity : AppCompatActivity() {
         activity = this
         userId = SharedPref.getString(context, SharedPref.USER_ID).toString()
         apiDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+        showDateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.US)
+        weekDaysList = Constants.getWeekDaysList()
+        val adapter =
+            ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, weekDaysList)
 
-        val calender = Calendar.getInstance()
-        val currentYear = calender.get(Calendar.YEAR)
-        val currentMonth = calender.get(Calendar.MONTH)
-        val today = calender.get(Calendar.DAY_OF_MONTH)
 
-        val fromDateCalender = Calendar.getInstance()
-        fromDateCalender.set(currentYear, currentMonth, today)
-        date = apiDateFormat.format(fromDateCalender.time)
-        getPendingBills()
 
 
         binding.apply {
-            tvDate.text = date
+            spinnerDays.adapter = adapter
+            spinnerDays.onItemSelectedListener =
+                object : AdapterView.OnItemClickListener, AdapterView.OnItemSelectedListener {
+                    override fun onItemClick(
+                        parent: AdapterView<*>?,
+                        view: View?,
+                        position: Int,
+                        id: Long
+                    ) {
+                    }
 
-            tvDate.setOnClickListener({
-                val datePickerDialog = DatePickerDialog(context, { _, year, month, dayOfMonth ->
+                    override fun onItemSelected(
+                        parent: AdapterView<*>?,
+                        view: View?,
+                        position: Int,
+                        id: Long
+                    ) {
+                        weekDay = weekDaysList[position]
+                        getPendingBills()
+                    }
 
-                    val selectedDate = Calendar.getInstance()
-                    selectedDate.set(year, month, dayOfMonth)
-                    date = apiDateFormat.format(selectedDate.time)
-                    tvDate.text = date
-                    getPendingBills()
+                    override fun onNothingSelected(parent: AdapterView<*>?) {}
+                }
 
-                }, currentYear, currentMonth, today)
-
-                datePickerDialog.show()
-            })
 
             imgBack.setOnClickListener({
                 finish()
@@ -98,7 +109,6 @@ class PendingBillsActivity : AppCompatActivity() {
             })
         }
 
-
     }
 
     private fun filterData(searchKey: String) {
@@ -120,7 +130,7 @@ class PendingBillsActivity : AppCompatActivity() {
         progressDialog.setCancelable(false)
         progressDialog.show()
         progressDialog.setMessage("Please wait...")
-        RetrofitClient.getInstance().api.getPendingBill(userId, date)
+        RetrofitClient.getInstance().api.getPendingBill(userId, weekDay)
             .enqueue(object : retrofit2.Callback<JsonObject> {
                 @SuppressLint("SetTextI18n")
                 override fun onResponse(
@@ -143,11 +153,22 @@ class PendingBillsActivity : AppCompatActivity() {
                                     val customerName = transactionObject.getString("CustomerName")
                                     val phone = transactionObject.getString("MobileNo")
                                     val address = transactionObject.getString("Address")
+                                    val area = transactionObject.getString("Area")
                                     val totalAmount = transactionObject.getString("TotalAmt")
                                     val receivedAmount = transactionObject.getString("ReceivedAmt")
                                     val balanceAmount = transactionObject.getString("BalanceAmt")
+                                    val paymentStatus = transactionObject.getString("PaymentStatus")
                                     var billDate = transactionObject.getString("BillDate")
+                                    val day = transactionObject.getString("Days")
                                     billDate = billDate.split("T")[0]
+
+                                    try {
+                                        val date = apiDateFormat.parse(billDate)
+                                        if (date != null) {
+                                            billDate = showDateFormat.format(date)
+                                        }
+                                    } catch (ignore: Exception) {
+                                    }
 
                                     val pendingBillModel = PendingBillsModel(
                                         id,
@@ -157,10 +178,11 @@ class PendingBillsActivity : AppCompatActivity() {
                                         totalAmount,
                                         receivedAmount,
                                         balanceAmount,
-                                        billDate
+                                        billDate, area, paymentStatus, day
                                     )
                                     dataList.add(pendingBillModel)
                                 }
+
 
                                 billAdapter = PendingBillAdapter(dataList,
                                     { billModel: PendingBillsModel ->
@@ -172,6 +194,8 @@ class PendingBillsActivity : AppCompatActivity() {
                                     LinearLayoutManager.VERTICAL,
                                     false
                                 )
+
+                                binding.tvTotal.text = "₹ $message"
                                 binding.billsRecycler.adapter = billAdapter
                                 binding.billsRecycler.layoutManager = layoutManager
 
@@ -217,9 +241,9 @@ class PendingBillsActivity : AppCompatActivity() {
                             val responseCode = responseObject.getString("response_code")
                             val message = responseObject.getString("response_msg")
                             if (responseCode.equals("TXN", ignoreCase = true)) {
-                                val intent=Intent(activity,BillDetailsActivity::class.java)
+                                val intent = Intent(activity, BillDetailsActivity::class.java)
 
-                                intent.putExtra("response",responseObject.toString())
+                                intent.putExtra("response", responseObject.toString())
                                 startActivity(intent)
 
                             } else {

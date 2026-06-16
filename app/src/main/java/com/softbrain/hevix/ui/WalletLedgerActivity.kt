@@ -27,6 +27,7 @@ import com.softbrain.hevix.utils.SharedPref
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
 class WalletLedgerActivity : AppCompatActivity() {
@@ -39,6 +40,7 @@ class WalletLedgerActivity : AppCompatActivity() {
     private lateinit var fromDate: String
     private lateinit var toDate: String
     private lateinit var apiDateFormat: SimpleDateFormat
+    private lateinit var showDateFormat: SimpleDateFormat
     private lateinit var dataList: ArrayList<WalletLedgerModel>
     private lateinit var ledgerAdapter: WalletLedgerAdapter
 
@@ -51,6 +53,7 @@ class WalletLedgerActivity : AppCompatActivity() {
         activity = this
         userId = SharedPref.getString(context, SharedPref.USER_ID).toString()
         apiDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+        showDateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.US)
 
         val calender = Calendar.getInstance()
         val currentYear = calender.get(Calendar.YEAR)
@@ -131,7 +134,7 @@ class WalletLedgerActivity : AppCompatActivity() {
         val filteredList = ArrayList<WalletLedgerModel>()
 
         for (item in dataList) {
-            if (item.billNo.contains(searchKey)) {
+            if (item.billNo.contains(searchKey) || item.txnType.lowercase(Locale.ROOT).contains(searchKey.lowercase(Locale.ROOT))) {
                 filteredList.add(item)
             }
         }
@@ -176,6 +179,14 @@ class WalletLedgerActivity : AppCompatActivity() {
                                     val billNo = transactionObject.getString("BillNo")
 
                                     txnDate = txnDate.split("T")[0]
+
+                                     try {
+                                        val date = apiDateFormat.parse(txnDate)
+                                        if (date != null) {
+                                            txnDate=showDateFormat.format(date)
+                                        }
+                                    } catch (ignore: Exception) {
+                                    }
                                     val walletLedgerModel = WalletLedgerModel(
                                         oldBalance, amount,
                                         newBalance, txnType, remarks, txnDate, crDrType, billNo

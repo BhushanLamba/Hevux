@@ -31,6 +31,8 @@ import org.json.JSONObject
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.OutputStream
+import java.text.SimpleDateFormat
+import java.util.Locale
 import java.util.Objects
 
 class BillDetailsActivity : AppCompatActivity() {
@@ -41,6 +43,10 @@ class BillDetailsActivity : AppCompatActivity() {
     private lateinit var userId: String
     private lateinit var dataList: ArrayList<BillDetailsModel>
     private lateinit var paymentDetailsList: ArrayList<PaymentDetailsModel>
+    private lateinit var apiDateFormat: SimpleDateFormat
+    private lateinit var showDateFormat: SimpleDateFormat
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +55,8 @@ class BillDetailsActivity : AppCompatActivity() {
         context = this
         activity = this
         userId = SharedPref.getString(context, SharedPref.USER_ID).toString()
+        apiDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+        showDateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.US)
         getSetData()
 
         binding.apply {
@@ -117,8 +125,15 @@ class BillDetailsActivity : AppCompatActivity() {
             val balanceAmount = transactionObject.getString("BalanceAmt")
             var billDate = transactionObject.getString("BillDate")
             val paymentStatus = transactionObject.getString("PaymentStatus")
-            billDate = billDate.split("T")[0] + "," + billDate.split("T")[1]
+            billDate = billDate.split("T")[0]
 
+            try {
+                val date = apiDateFormat.parse(billDate)
+                if (date != null) {
+                    billDate = showDateFormat.format(date)
+                }
+            } catch (ignore: Exception) {
+            }
 
             val orderDetailsArray = responseObject.getJSONArray("orderdetails")
             dataList = ArrayList()
@@ -143,11 +158,18 @@ class BillDetailsActivity : AppCompatActivity() {
                 val billNo = paymentDetailsObject.getString("BillNo")
                 val amount = paymentDetailsObject.getString("Amount")
                 val paymentMode = paymentDetailsObject.getString("PaymentMode")
-                var date = paymentDetailsObject.getString("ReqDate")
+                var reqDate = paymentDetailsObject.getString("ReqDate")
 
-                date = date.split("T")[0] + "," + date.split("T")[1]
+                reqDate = reqDate.split("T")[0]
 
-                val paymentDetailsModel = PaymentDetailsModel(billNo, amount, paymentMode, date)
+                try {
+                    val date = apiDateFormat.parse(reqDate)
+                    if (date != null) {
+                        reqDate = showDateFormat.format(date)
+                    }
+                } catch (ignore: Exception) {
+                }
+                val paymentDetailsModel = PaymentDetailsModel(billNo, amount, paymentMode, reqDate)
                 paymentDetailsList.add(paymentDetailsModel)
             }
 

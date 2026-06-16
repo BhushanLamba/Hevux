@@ -34,6 +34,7 @@ class CartActivity : AppCompatActivity() {
 
     private lateinit var receivedAmount: String
     private lateinit var remarks: String
+    private var paymentMode="CASH"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,12 +75,19 @@ class CartActivity : AppCompatActivity() {
     }
 
     private fun bookOrder() {
+
+        paymentMode = if(binding.rbCash.isChecked) {
+            "CASH"
+        } else {
+            "ONLINE"
+        }
+
         val progressDialog = ProgressDialog(context)
         progressDialog.setCancelable(false)
         progressDialog.show()
         progressDialog.setMessage("Please wait...")
         RetrofitClient.getInstance().api.bookOrder(
-            customerId, userId, "CASH", receivedAmount, customerName, customerAddress,
+            customerId, userId, paymentMode, receivedAmount, customerName, customerAddress,
             customerMobile, customerArea, remarks
         )
             .enqueue(object : retrofit2.Callback<JsonObject> {

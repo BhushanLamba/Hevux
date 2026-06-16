@@ -55,7 +55,7 @@
         android:id="@+id/et_search"
         android:background="@drawable/round_back"
         android:padding="10dp"
-        android:hint="Search Bill no..."
+        android:hint="Search Bill no/Mobile no..."
         android:layout_margin="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>

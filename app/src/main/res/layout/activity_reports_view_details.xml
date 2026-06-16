@@ -31,7 +31,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="9891626651, 9891626621\nWear House: Reotith Bazar, Near By Panchmukhi Hanuman Mandir, Gopalganj, Bihar-841409"
+                android:text="9891626651\nWear House: Reotith Bazar, Near By Panchmukhi Hanuman Mandir, Gopalganj, Bihar-841409"
                 android:textColor="@color/black" />
 
             <TextView
@@ -39,7 +39,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="Bill details"
+                android:text="Report Details"
                 android:textColor="@color/black"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -58,19 +58,14 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/top_round"
                     android:backgroundTint="@color/primaryColor"
-                    android:drawableEnd="@drawable/more"
-                    android:drawablePadding="10dp"
-                    android:drawableTint="@color/white"
                     android:paddingHorizontal="10dp"
                     android:paddingVertical="10dp"
-                    android:text="Customer Details"
+                    android:text="Details"
                     android:textColor="@color/white"
                     android:textStyle="bold" />
 
 
                 <LinearLayout
-                    tools:visibility="visible"
-                    android:visibility="gone"
                     android:id="@+id/customer_details_ly"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -286,50 +281,6 @@
 
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/tv_order_details"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/top_round"
-                android:backgroundTint="@color/primaryColor"
-                android:drawableEnd="@drawable/more"
-                android:drawablePadding="10dp"
-                android:drawableTint="@color/white"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="10dp"
-                android:text="Order Details"
-                android:textColor="@color/white"
-                android:textStyle="bold" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                tools:visibility="visible"
-                android:id="@+id/order_details_recycler"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone" />
-
-            <TextView
-                android:layout_marginTop="4dp"
-                android:id="@+id/tv_payement_details"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/top_round"
-                android:backgroundTint="@color/primaryColor"
-                android:drawableEnd="@drawable/more"
-                android:drawablePadding="10dp"
-                android:drawableTint="@color/white"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="10dp"
-                android:text="Payment Details"
-                android:textColor="@color/white"
-                android:textStyle="bold" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                tools:visibility="visible"
-                android:id="@+id/payment_details_recycler"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone" />
 
         </LinearLayout>
     </ScrollView>

@@ -131,6 +131,98 @@
             android:layout_height="wrap_content"/>
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_weight="1"
+            android:layout_margin="4dp"
+            android:text="Payment Status"
+            android:textColor="@color/grey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/tv_payment_status"
+            android:textColor="@color/black"
+            android:layout_weight="1"
+            android:layout_margin="4dp"
+            android:text="Payment Status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_weight="1"
+            android:layout_margin="4dp"
+            android:text="Bill Date"
+            android:textColor="@color/grey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/tv_bill_date"
+            android:textColor="@color/black"
+            android:layout_weight="1"
+            android:layout_margin="4dp"
+            android:text="Bill Date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_weight="1"
+            android:layout_margin="4dp"
+            android:text="Day"
+            android:textColor="@color/grey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/tv_day"
+            android:textColor="@color/black"
+            android:layout_weight="1"
+            android:layout_margin="4dp"
+            android:text="Day"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_weight="1"
+            android:layout_margin="4dp"
+            android:text="Area"
+            android:textColor="@color/grey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/tv_area"
+            android:textColor="@color/black"
+            android:layout_weight="1"
+            android:layout_margin="4dp"
+            android:text="Area"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
     <TextView
         android:gravity="end"
         android:paddingVertical="4dp"

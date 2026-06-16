@@ -9,5 +9,6 @@ data class ReportModel(
     val amount: String,
     val balanceAmount: String,
     val address: String,
-    val billNo: String
+    val billNo: String,
+    val area:String
 )
